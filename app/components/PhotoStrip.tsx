@@ -80,7 +80,7 @@ export default function PhotoStrip({
       });
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `happibooth-${layout}-${theme.name.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.jpg`;
+      a.download = `photobox-${layout}-${theme.name.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.jpg`;
       a.click();
     } catch (err) { console.error(err); }
     setDownloading(false);
@@ -90,22 +90,29 @@ export default function PhotoStrip({
   if (photos.length === 0) {
     return (
       <div style={{
-        width: 260, minHeight: 380,
-        border: "2px dashed #ddd4c5", borderRadius: 18,
-        background: "linear-gradient(135deg,#fff,#faf7f2)",
+        width: 240, minHeight: 340,
+        border: "1.5px dashed rgba(255,255,255,0.1)",
+        borderRadius: 16,
+        background: "rgba(255,255,255,0.03)",
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        padding: 28, textAlign: "center",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
+        padding: 24, textAlign: "center",
+        margin: "0 auto",
       }}>
-        <Film size={44} style={{ color: "#e0d0bc", marginBottom: 14 }} />
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontWeight: 800, fontSize: "0.88rem", color: "#c5b89a" }}>PHOTO STRIP</p>
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.75rem", color: "#d4c5ae", marginTop: 8, lineHeight: 1.7 }}>
-          Shoot {photoCount} photos on the left<br/>— your strip appears here ✨
+        <Film size={36} style={{ color: "#55556a", marginBottom: 12, opacity: 0.5 }} />
+        <p style={{ fontWeight: 700, fontSize: "0.82rem", color: "#8b8b9e" }}>
+          PHOTO STRIP
         </p>
-        <div style={{ display: "flex", gap: 6, marginTop: 20 }}>
+        <p style={{ fontSize: "0.72rem", color: "#666680", marginTop: 8, lineHeight: 1.7 }}>
+          Shoot {photoCount} photos<br/>— your strip appears here ✨
+        </p>
+        <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
           {Array.from({ length: photoCount }).map((_, i) => (
-            <div key={i} style={{ width: 34, height: 26, borderRadius: 5, background: "#f0ece4", border: "1.5px dashed #ddd4c5" }} />
+            <div key={i} style={{ 
+              width: 30, height: 22, borderRadius: 4, 
+              background: "rgba(255,255,255,0.06)", 
+              border: "1.5px dashed rgba(255,255,255,0.1)" 
+            }} />
           ))}
         </div>
       </div>
@@ -114,64 +121,76 @@ export default function PhotoStrip({
 
   /* ── layout sizing ── */
   const isFilm   = !!theme.filmStrip && layout === 'vertical';
-  let cw         = 240;          // container width (inner, no perf)
+  let cw         = 220;
   let layoutCls  = "flex flex-col";
   let aspect     = "4 / 3";
   let strategy   = verticalListSortingStrategy;
 
   if (layout === 'grid') {
-    cw        = 420;
+    cw        = 340;
     layoutCls = "grid grid-cols-2";
     strategy  = rectSortingStrategy;
   } else if (layout === 'landscape') {
-    cw        = photos.length * 200 + 24;
+    cw        = photos.length * 180 + 24;
     layoutCls = "flex flex-row";
     aspect    = "3 / 4";
     strategy  = horizontalListSortingStrategy;
   }
 
-  const perfW = 16; // perforation column width
+  const perfW = 16;
   const totalW = isFilm ? cw + perfW * 2 : cw;
 
-  /* ── action bar ── */
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, fontFamily: "'DM Sans',sans-serif" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, fontFamily: "'Inter', sans-serif" }}>
 
       {/* action buttons */}
-      <div style={{ display: "flex", gap: 10, width: totalW }}>
+      <div style={{ display: "flex", gap: 8, width: totalW }}>
         <button
           onClick={onReset}
           title="Reset [R]"
           style={{
-            width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
-            border: "1.5px solid #ede8e0", background: "#faf7f2",
-            color: "#8B7355", cursor: "pointer",
+            width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+            border: "1px solid rgba(255,255,255,0.06)", 
+            background: "rgba(255,255,255,0.03)",
+            color: "#8b8b9e", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all .15s",
+            transition: "all .2s",
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background="#fff0f0"; (e.currentTarget as HTMLButtonElement).style.color="#e57373"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background="#faf7f2"; (e.currentTarget as HTMLButtonElement).style.color="#8B7355"; }}
+          onMouseEnter={e => { 
+            e.currentTarget.style.background = "rgba(239,68,68,0.15)"; 
+            e.currentTarget.style.color = "#f87171"; 
+            e.currentTarget.style.borderColor = "rgba(239,68,68,0.4)";
+          }}
+          onMouseLeave={e => { 
+            e.currentTarget.style.background = "rgba(255,255,255,0.03)"; 
+            e.currentTarget.style.color = "#8b8b9e"; 
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+          }}
         >
-          <RotateCcw size={15} />
+          <RotateCcw size={14} />
         </button>
 
         <button
           onClick={downloadStrip}
           disabled={downloading || retakeIndex !== null}
           style={{
-            flex: 1, height: 40, borderRadius: 40, border: "none",
-            background: (downloading || retakeIndex !== null)
-              ? "#ece7df"
-              : "linear-gradient(135deg,#f59e0b,#d97706)",
-            color: (downloading || retakeIndex !== null) ? "#c0b8a8" : "#fff",
-            fontWeight: 700, fontSize: "0.85rem",
+            flex: 1, height: 36, borderRadius: 20, border: "none",
+            fontWeight: 700, fontSize: "0.8rem",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
             cursor: (downloading || retakeIndex !== null) ? "not-allowed" : "pointer",
-            boxShadow: (downloading || retakeIndex !== null) ? "none" : "0 4px 14px rgba(217,119,6,.28)",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
-            transition: "all .15s",
+            transition: "all 0.2s ease",
+            background: (downloading || retakeIndex !== null)
+              ? "rgba(255,255,255,0.05)"
+              : "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+            color: (downloading || retakeIndex !== null) ? "#55556a" : "#fff",
+            boxShadow: (downloading || retakeIndex !== null)
+              ? "none"
+              : "0 4px 16px rgba(139,92,246,0.3)",
           }}
+          onMouseEnter={e => { if (!(downloading || retakeIndex !== null)) e.currentTarget.style.transform = "translateY(-1px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
         >
-          <Download size={14} />
+          <Download size={13} />
           {downloading ? "Saving…" : "Download Photo"}
         </button>
       </div>
@@ -194,16 +213,15 @@ export default function PhotoStrip({
           width: cw,
           background: theme.stripBg,
           padding: layout === 'landscape'
-            ? "14px 14px 60px"
-            : (theme.stripPadding ?? "14px 12px 52px"),
+            ? "12px 12px 52px"
+            : (theme.stripPadding ?? "12px 10px 48px"),
           position: "relative",
           border: theme.outerBorder ?? "none",
           borderRadius: isFilm ? 0 : (theme.outerRadius ?? 0),
-          boxShadow: isFilm ? "none" : `0 10px 40px rgba(0,0,0,0.12)${theme.innerGlow ? `, ${theme.innerGlow}` : ""}`,
+          boxShadow: isFilm ? "none" : `0 10px 40px rgba(0,0,0,0.3)${theme.innerGlow ? `, ${theme.innerGlow}` : ""}`,
           transition: "all .4s",
-          overflow: "hidden",
         }}>
-          {/* subtle inner accent ring for ornate/neon */}
+          {/* subtle inner accent ring */}
           {theme.innerGlow && !isFilm && (
             <div style={{
               position: "absolute", inset: 5, pointerEvents: "none", zIndex: 1,
@@ -219,7 +237,7 @@ export default function PhotoStrip({
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={photos.map(p => p.id)} strategy={strategy}>
-              <div className={`${layoutCls} gap-[8px] relative z-10 w-full`}>
+              <div className={`${layoutCls} gap-[6px] relative z-10 w-full`}>
                 {photos.map((photo, i) => (
                   <SortablePhotoItem
                     key={photo.id}
@@ -240,17 +258,17 @@ export default function PhotoStrip({
             </SortableContext>
           </DndContext>
 
-          {/* draggable strip stickers (strip mode only) */}
+          {/* draggable strip stickers */}
           {stickerMode === 'strip' && stripStickers.map(st => <StripStickerItem key={st.id} st={st} />)}
 
           {/* footer text */}
           <div style={{
-            position: "absolute", bottom: layout === 'landscape' ? 12 : 10,
+            position: "absolute", bottom: layout === 'landscape' ? 10 : 8,
             left: 0, right: 0, textAlign: "center", padding: "0 8px", zIndex: 5,
           }}>
             <p style={{
-              fontFamily: theme.fontFamily ?? "'DM Mono',monospace",
-              fontSize: layout === 'grid' ? "0.78rem" : "0.65rem",
+              fontFamily: theme.fontFamily ?? "'JetBrains Mono', monospace",
+              fontSize: layout === 'grid' ? "0.72rem" : "0.6rem",
               color: theme.textColor,
               letterSpacing: theme.letterSpacing ?? "0.18em",
               fontWeight: 700, opacity: 0.92, margin: 0,
@@ -259,7 +277,7 @@ export default function PhotoStrip({
               {customText.trim() === '' ? theme.name : customText}
             </p>
             <p style={{
-              fontFamily: "'DM Mono',monospace", fontSize: "0.55rem",
+              fontFamily: "'JetBrains Mono', monospace", fontSize: "0.5rem",
               color: theme.textColor, opacity: 0.42, marginTop: 3, letterSpacing: "0.1em",
             }}>
               {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toUpperCase()}
@@ -269,17 +287,6 @@ export default function PhotoStrip({
 
         {isFilm && <Perf bg={theme.stripBg} count={photos.length} />}
       </div>
-
-      <style>{`
-        @keyframes ps-develop {
-          from { opacity:0; filter:brightness(2.5) saturate(0); transform:scale(1.03); }
-          to   { opacity:1; filter:brightness(1) saturate(1); transform:scale(1); }
-        }
-        @keyframes ps-enter {
-          from { opacity:0; transform:translateY(18px); }
-          to   { opacity:1; transform:translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -288,7 +295,7 @@ export default function PhotoStrip({
 function Perf({ bg, count }: { bg?: string; count: number }) {
   const safeBg = bg || "#0d0d0d";
   const fill   = (safeBg.startsWith("linear") || safeBg.startsWith("radial")) ? "#0d0d0d" : safeBg;
-  const holes  = count * 3 + 2;   // proportional hole count
+  const holes  = count * 3 + 2;
   return (
     <div style={{
       width: 16, background: fill,
@@ -303,7 +310,7 @@ function Perf({ bg, count }: { bg?: string; count: number }) {
   );
 }
 
-/* ── Strip Sticker Item (for strip mode) ── */
+/* ── Strip Sticker Item ── */
 function StripStickerItem({ st }: { st: Sticker }) {
   const nodeRef = useRef<HTMLDivElement>(null);
   return (

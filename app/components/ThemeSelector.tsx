@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { Film } from "lucide-react";
 import { THEMES, THEME_CATEGORIES, ThemeCategory } from "../constants/themes";
 
 interface Props {
@@ -18,69 +19,56 @@ export default function ThemeSelector({ activeThemeId, onSelect, disabled }: Pro
 
   return (
     <div
-      className="w-full max-w-2xl transition-opacity duration-300"
+      className="glass-card"
       style={{
-        background: "#fff",
-        borderRadius: 20,
-        padding: "20px 20px 16px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-        border: "1.5px solid #ede8e0",
-        opacity: disabled ? 0.45 : 1,
+        padding: "18px 18px 14px",
+        opacity: disabled ? 0.35 : 1,
         pointerEvents: disabled ? "none" : "auto",
+        transition: "opacity 0.4s ease",
       }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <span style={{ fontSize: 18 }}>🎞</span>
-        <span
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 700,
-            fontSize: "0.9rem",
-            color: "#374151",
-          }}
-        >
-          Frame Style
-        </span>
+      <div className="section-label">
+        <Film size={14} />
+        <span>Frame Style</span>
       </div>
 
-      {/* ── Category tabs ──────────────────────────────────────────── */}
+      {/* Category tabs */}
       <div
-        className="flex gap-2 pb-1 mb-4"
-        style={{ overflowX: "auto" }}
+        className="hide-scrollbar"
+        style={{
+          display: "flex",
+          gap: 6,
+          paddingBottom: 12,
+          marginBottom: 14,
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          overflowX: "auto",
+        }}
       >
         {THEME_CATEGORIES.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            style={{
-              flexShrink: 0,
-              padding: "5px 14px",
-              borderRadius: 20,
-              border: "none",
-              cursor: "pointer",
-              background: activeCategory === cat ? "#f59e0b" : "#f5f0e8",
-              color: activeCategory === cat ? "#fff" : "#8B7355",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.76rem",
-              fontWeight: 700,
-              transition: "all 0.15s ease",
-            }}
+            className={`tab-pill ${activeCategory === cat ? "active" : ""}`}
+            style={{ padding: "6px 12px", fontSize: "0.72rem" }}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      {/* ── Theme buttons ──────────────────────────────────────────── */}
+      {/* Theme buttons */}
       <div
-        className="flex gap-3 pb-2"
-        style={{ overflowX: "auto" }}
+        className="hide-scrollbar"
+        style={{
+          display: "flex",
+          gap: 8,
+          paddingBottom: 4,
+          overflowX: "auto",
+        }}
       >
         {filtered.map((theme) => {
           const isActive = theme.id === activeThemeId;
-          // preview background: strip bg (gradient or solid)
-          const previewBg = theme.previewBg;
 
           return (
             <button
@@ -91,28 +79,44 @@ export default function ThemeSelector({ activeThemeId, onSelect, disabled }: Pro
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 8,
+                gap: 6,
                 padding: "10px 10px 8px",
-                borderRadius: 14,
-                border: isActive ? "2px solid #f59e0b" : "2px solid #f0ece6",
-                background: isActive ? "#fffbf0" : "#fafaf9",
+                borderRadius: 12,
+                border: isActive
+                  ? "1.5px solid #8b5cf6"
+                  : "1.5px solid rgba(255,255,255,0.06)",
+                background: isActive
+                  ? "rgba(139, 92, 246, 0.1)"
+                  : "rgba(255,255,255,0.03)",
                 cursor: "pointer",
-                boxShadow: isActive
-                  ? "0 4px 14px rgba(245,158,11,0.22)"
-                  : "0 1px 4px rgba(0,0,0,0.04)",
+                boxShadow: isActive ? "0 0 20px rgba(139,92,246,0.25)" : "none",
                 transform: isActive ? "translateY(-2px) scale(1.04)" : "none",
-                transition: "all 0.2s cubic-bezier(0.34,1.56,0.64,1)",
+                transition: "all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                  e.currentTarget.style.transform = "none";
+                }
               }}
             >
-              {/* ── Mini strip preview ──────────────────────────── */}
+              {/* Mini strip preview */}
               <div
                 style={{
-                  width: 40,
-                  height: 62,
+                  width: 36,
+                  height: 56,
                   borderRadius: 4,
                   overflow: "hidden",
-                  background: previewBg,
-                  border: theme.outerBorder ?? "1.5px solid #e5e7eb",
+                  background: theme.previewBg,
+                  border: theme.outerBorder ?? "1px solid rgba(255,255,255,0.1)",
                   position: "relative",
                   flexShrink: 0,
                 }}
@@ -140,7 +144,7 @@ export default function ThemeSelector({ activeThemeId, onSelect, disabled }: Pro
                           width: 3,
                           height: 5,
                           borderRadius: 1,
-                          background: "rgba(0,0,0,0.22)",
+                          background: "rgba(255,255,255,0.15)",
                         }}
                       />
                     ))}
@@ -162,10 +166,17 @@ export default function ThemeSelector({ activeThemeId, onSelect, disabled }: Pro
                     <div
                       key={i}
                       style={{
-                        height: 15,
-                        borderRadius: Math.min((theme.photoRadius ?? 0) * 0.25, 3),
+                        height: 13,
+                        borderRadius: Math.min(
+                          (theme.photoRadius ?? 0) * 0.25,
+                          3
+                        ),
                         border: theme.photoBorder,
-                        background: ["#d8d8d8", "#c8c8c8", "#d0d0d0"][i],
+                        background: [
+                          "rgba(255,255,255,0.15)",
+                          "rgba(255,255,255,0.1)",
+                          "rgba(255,255,255,0.12)",
+                        ][i],
                         opacity: 0.85,
                       }}
                     />
@@ -176,13 +187,13 @@ export default function ThemeSelector({ activeThemeId, onSelect, disabled }: Pro
               {/* Label */}
               <span
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "0.63rem",
-                  fontWeight: 700,
-                  color: isActive ? "#b45309" : "#9ca3af",
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: "0.58rem",
+                  fontWeight: 600,
+                  color: isActive ? "#a78bfa" : "#55556a",
                   textAlign: "center",
-                  maxWidth: 52,
-                  lineHeight: 1.3,
+                  maxWidth: 48,
+                  lineHeight: 1.2,
                 }}
               >
                 {theme.name}

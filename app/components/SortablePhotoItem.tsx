@@ -33,6 +33,8 @@ function StickerItem({ st }: { st: Sticker }) {
           fontSize: STICKER_SIZE_MAP[st.size],
           transform: `rotate(${st.rotation}deg)`,
           opacity: st.opacity,
+          lineHeight: 1,
+          userSelect: "none",
         }}>
         {st.emoji}
       </div>
@@ -69,37 +71,33 @@ export default function SortablePhotoItem({
     cursor: isDragging ? 'grabbing' : 'grab',
   };
 
+  const borderRadius = activeBorder?.css?.borderRadius || 6;
+
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className="relative group w-full"
+      style={{
+        ...style,
+        position: "relative",
+        aspectRatio: aspect,
+        borderRadius,
+      }}
+      className="group w-full"
     >
+      {/* Image layer - overflow hidden to crop the photo */}
       <div
         style={{
-          border: activeBorder?.css?.border || "3px solid white",
-          borderRadius: activeBorder?.css?.borderRadius || 8,
+          position: "absolute",
+          inset: 0,
+          border: activeBorder?.css?.border || "2px solid rgba(255,255,255,0.15)",
+          borderRadius,
           overflow: "hidden",
-          aspectRatio: aspect,
           animation: `ps-develop .8s cubic-bezier(.22,1,.36,1) both`,
           animationDelay: `${index * 0.14}s`,
-          boxShadow: "0 2px 10px rgba(0,0,0,0.16)",
-          position: "relative",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
           ...(activeBorder?.css || {}),
         }}
       >
-        {/* Drag Handle */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="absolute top-2 right-2 z-30 bg-white/90 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-          style={{
-            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-          }}
-        >
-          <GripVertical size={16} style={{ color: "#8B7355" }} />
-        </div>
-
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.src}
@@ -113,100 +111,147 @@ export default function SortablePhotoItem({
             filter: activeFilter,
           }}
         />
+      </div>
 
-        {/* Photo-mode stickers */}
-        {stickerMode === 'photo' && photo.stickers.map(st => (
-          <StickerItem key={st.id} st={st} />
-        ))}
-
-        {/* hover controls */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 z-20"
-          style={{ background: "rgba(0,0,0,0.44)", backdropFilter: "blur(2px)" }}>
-          <div style={{ display: "flex", gap: 6 }}>
-            <button
-              onClick={() => onMovePhoto(index, -1)} 
-              disabled={index === 0}
-              style={{ 
-                padding: "6px", 
-                borderRadius: "50%", 
-                background: "rgba(255,255,255,0.9)", 
-                border: "none", 
-                cursor: index === 0 ? "not-allowed" : "pointer", 
-                opacity: index === 0 ? 0.3 : 1, 
-                transition: "transform .15s" 
-              }}
-              onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.transform="scale(1.1)"}
-              onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.transform="scale(1)"}
-            >
-              {layout === 'vertical' ? <ChevronUp size={14}/> : <ChevronLeft size={14}/>}
-            </button>
-            <button
-              onClick={() => onMovePhoto(index, 1)} 
-              disabled={index === totalPhotos - 1}
-              style={{ 
-                padding: "6px", 
-                borderRadius: "50%", 
-                background: "rgba(255,255,255,0.9)", 
-                border: "none", 
-                cursor: index === totalPhotos - 1 ? "not-allowed" : "pointer", 
-                opacity: index === totalPhotos - 1 ? 0.3 : 1, 
-                transition: "transform .15s" 
-              }}
-              onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.transform="scale(1.1)"}
-              onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.transform="scale(1)"}
-            >
-              {layout === 'vertical' ? <ChevronDown size={14}/> : <ChevronRight size={14}/>}
-            </button>
+      {/* Sticker layer - NOT overflow hidden, so stickers can be dragged freely */}
+      {stickerMode === 'photo' && photo.stickers.length > 0 && (
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius,
+          overflow: "hidden",
+          zIndex: 15,
+          pointerEvents: "none",
+        }}>
+          <div style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            pointerEvents: "auto",
+          }}>
+            {photo.stickers.map(st => (
+              <StickerItem key={st.id} st={st} />
+            ))}
           </div>
+        </div>
+      )}
+
+      {/* Drag handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-1.5 right-1.5 z-30 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+        style={{
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(4px)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+        }}
+      >
+        <GripVertical size={12} style={{ color: "rgba(255,255,255,0.7)" }} />
+      </div>
+
+      {/* Hover controls overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 z-20"
+        style={{ 
+          background: "rgba(0,0,0,0.55)", 
+          backdropFilter: "blur(3px)",
+          borderRadius,
+        }}>
+        <div style={{ display: "flex", gap: 4 }}>
           <button
-            onClick={() => onRequestRetake(index)}
-            style={{
-              background: "white", 
-              color: "#374151",
-              padding: "5px 12px", 
-              borderRadius: 20, 
-              border: "none",
-              fontWeight: 700, 
-              fontSize: "0.72rem", 
-              cursor: "pointer",
-              display: "flex", 
-              alignItems: "center", 
-              gap: 5,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.2)", 
-              transition: "transform .15s",
+            onClick={() => onMovePhoto(index, -1)} 
+            disabled={index === 0}
+            style={{ 
+              padding: "5px", 
+              borderRadius: "50%", 
+              background: "rgba(255,255,255,0.15)", 
+              border: "1px solid rgba(255,255,255,0.2)", 
+              cursor: index === 0 ? "not-allowed" : "pointer", 
+              opacity: index === 0 ? 0.3 : 1, 
+              transition: "all .15s",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.transform="scale(1.05)"}
-            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.transform="scale(1)"}
+            onMouseEnter={e => { if (index !== 0) e.currentTarget.style.background = "rgba(255,255,255,0.25)"; }}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
           >
-            <RefreshCcw size={11} style={{ color: "#ef4444" }} /> Retake
+            {layout === 'vertical' ? <ChevronUp size={12}/> : <ChevronLeft size={12}/>}
+          </button>
+          <button
+            onClick={() => onMovePhoto(index, 1)} 
+            disabled={index === totalPhotos - 1}
+            style={{ 
+              padding: "5px", 
+              borderRadius: "50%", 
+              background: "rgba(255,255,255,0.15)", 
+              border: "1px solid rgba(255,255,255,0.2)", 
+              cursor: index === totalPhotos - 1 ? "not-allowed" : "pointer", 
+              opacity: index === totalPhotos - 1 ? 0.3 : 1, 
+              transition: "all .15s",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onMouseEnter={e => { if (index !== totalPhotos - 1) e.currentTarget.style.background = "rgba(255,255,255,0.25)"; }}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
+          >
+            {layout === 'vertical' ? <ChevronDown size={12}/> : <ChevronRight size={12}/>}
           </button>
         </div>
-
-        {retakeIndex === index && (
-          <div style={{
-            position: "absolute", 
-            inset: 0, 
-            zIndex: 10,
-            background: "rgba(239,68,68,0.2)", 
-            border: "3px solid #ef4444",
+        <button
+          onClick={() => onRequestRetake(index)}
+          style={{
+            background: "rgba(255,255,255,0.15)", 
+            color: "white",
+            padding: "4px 10px", 
+            borderRadius: 16, 
+            border: "1px solid rgba(255,255,255,0.2)",
+            fontWeight: 700, 
+            fontSize: "0.65rem", 
+            cursor: "pointer",
             display: "flex", 
             alignItems: "center", 
-            justifyContent: "center",
-          }}>
-            <span style={{ 
-              background: "#ef4444", 
-              color: "white", 
-              padding: "3px 8px", 
-              fontSize: "0.65rem", 
-              fontWeight: 700, 
-              borderRadius: 6, 
-              animation: "pulse 1s infinite" 
-            }}>
-              RETAKING…
-            </span>
-          </div>
-        )}
+            gap: 4,
+            backdropFilter: "blur(4px)",
+            transition: "all .15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
+        >
+          <RefreshCcw size={10} style={{ color: "#f87171" }} /> Retake
+        </button>
       </div>
+
+      {/* Retake indicator */}
+      {retakeIndex === index && (
+        <div style={{
+          position: "absolute", 
+          inset: 0, 
+          zIndex: 25,
+          background: "rgba(139,92,246,0.2)", 
+          border: "2px solid #8b5cf6",
+          borderRadius,
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center",
+        }}>
+          <span style={{ 
+            background: "#8b5cf6", 
+            color: "white", 
+            padding: "3px 8px", 
+            fontSize: "0.6rem", 
+            fontWeight: 700, 
+            borderRadius: 6, 
+            animation: "pulse-soft 1s infinite",
+            boxShadow: "0 0 12px rgba(139,92,246,0.25)",
+          }}>
+            RETAKING…
+          </span>
+        </div>
+      )}
     </div>
   );
 }
