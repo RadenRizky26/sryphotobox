@@ -245,8 +245,8 @@ export default function PhotoboothPro() {
                   margin: 0,
                 }}
               >
-                PHOTOBOX{" "}
-                <span style={{ color: "#a78bfa" }}>PRO</span>
+                Sry
+                <span style={{ color: "#a78bfa" }}>Photobox</span>
               </h1>
               <p
                 style={{
@@ -258,7 +258,7 @@ export default function PhotoboothPro() {
                   marginTop: 2,
                 }}
               >
-                Professional Photo Booth
+                Capture Your Best Moments
               </p>
             </div>
           </div>

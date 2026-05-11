@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PhotoBox Pro — Professional Photo Booth",
+  title: "SryPhotobox — Capture Your Best Moments",
   description: "Create stunning photo strips with professional filters, themes, stickers, and layouts. Capture, customize, and download beautiful photo booth memories.",
   keywords: ["photo booth", "photo strip", "camera", "filters", "stickers"],
 };
