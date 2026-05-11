@@ -151,11 +151,10 @@ export default function CameraView({
 
       {/* ── VIEWFINDER ── */}
       <div
+        className="viewfinder"
         style={{
           position: "relative",
           width: "100%",
-          aspectRatio: "16 / 9",
-          borderRadius: 16,
           overflow: "hidden",
           background: "#000",
           border: "1px solid rgba(255,255,255,0.06)",

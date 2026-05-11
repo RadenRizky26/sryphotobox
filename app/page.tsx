@@ -152,7 +152,7 @@ export default function PhotoboothPro() {
 
   return (
     <main
-      className="bg-grid bg-radial-glow"
+      className="app-main"
       style={{
         minHeight: "100vh",
         background:
@@ -208,22 +208,13 @@ export default function PhotoboothPro() {
       >
         {/* ═══ HEADER ═══ */}
         <header
-          className="animate-fade-in"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 28,
-            padding: "0 4px",
-          }}
+          className="animate-fade-in app-header"
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             {/* Logo mark */}
             <div
+              className="logo-mark"
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
                 background:
                   "linear-gradient(135deg, #8b5cf6, #6d28d9)",
                 display: "flex",
@@ -236,9 +227,9 @@ export default function PhotoboothPro() {
             </div>
             <div>
               <h1
+                className="logo-text"
                 style={{
                   fontFamily: "'Bebas Neue', cursive",
-                  fontSize: "1.6rem",
                   letterSpacing: "0.08em",
                   lineHeight: 1,
                   color: "#f0f0f5",
@@ -263,14 +254,8 @@ export default function PhotoboothPro() {
             </div>
           </div>
 
-          {/* Keyboard hints */}
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              alignItems: "center",
-            }}
-          >
+          {/* Keyboard hints - hidden on mobile */}
+          <div className="keyboard-hints">
             {[
               ["SPACE", "shoot"],
               ["F", "flash"],
@@ -313,14 +298,7 @@ export default function PhotoboothPro() {
         </header>
 
         {/* ═══ MAIN GRID ═══ */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 380px",
-            gap: 24,
-            alignItems: "start",
-          }}
-        >
+        <div className="app-grid">
           {/* ━━━━━━━ LEFT: Camera ━━━━━━━ */}
           <div
             className="animate-fade-in"
@@ -346,17 +324,9 @@ export default function PhotoboothPro() {
 
           {/* ━━━━━━━ RIGHT: Sidebar ━━━━━━━ */}
           <div
-            className="animate-fade-in"
+            className="animate-fade-in app-sidebar hide-scrollbar"
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
               animationDelay: "0.2s",
-              position: "sticky",
-              top: 16,
-              minWidth: 0,
-              maxHeight: "calc(100vh - 32px)",
-              overflowY: "auto",
             }}
           >
             {/* Strip Preview */}
